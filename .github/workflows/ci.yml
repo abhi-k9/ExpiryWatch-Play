@@ -77,6 +77,22 @@ jobs:
             grep -F "$registrar" <<< "$methods" || true
           done
           exit $status
+      - name: Check that the foss build has the donation link
+        env:
+          DONATION_URL: ${{ secrets.DONATION_URL }}
+        run: |
+          # Only reports whether it's there; the link itself stays out of the logs.
+          if [ -z "$DONATION_URL" ]; then
+            echo "::warning::The DONATION_URL secret isn't set, so the foss build offers no donations."
+            exit 0
+          fi
+          apk=$(find app/build/outputs/apk/foss/release -name '*.apk' | head -1)
+          if unzip -p "$apk" 'classes*.dex' | grep -qaF "$DONATION_URL"; then
+            echo "The foss build has the donation link."
+          else
+            echo "::error::The foss build doesn't have the donation link."
+            exit 1
+          fi
       - name: Upload APKs
         uses: actions/upload-artifact@v7
         with:
