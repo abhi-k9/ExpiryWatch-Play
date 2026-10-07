@@ -11,6 +11,7 @@ import android.os.Build
 import android.provider.Settings
 import android.text.format.DateFormat
 import android.text.format.Formatter
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Kitchen
 import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.LocalCafe
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.Palette
@@ -85,6 +87,8 @@ import io.github.abhik9.expirywatch.core.designsystem.component.SectionHeader
 import io.github.abhik9.expirywatch.core.designsystem.theme.supportsDynamicTheming
 import io.github.abhik9.expirywatch.core.domain.backup.BackupCodec
 import io.github.abhik9.expirywatch.core.domain.usecase.BackupResult
+import io.github.abhik9.expirywatch.core.donations.DonationOption
+import io.github.abhik9.expirywatch.core.donations.DonationState
 import io.github.abhik9.expirywatch.core.model.ThemeMode
 import io.github.abhik9.expirywatch.core.model.UserSettings
 import io.github.abhik9.expirywatch.core.navigation.LabelKind
@@ -100,6 +104,8 @@ internal fun SettingsRoute(
 ) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
     val diagnostics by viewModel.diagnostics.collectAsStateWithLifecycle()
+    val donationState by viewModel.donationState.collectAsStateWithLifecycle()
+    val activity = LocalActivity.current
     val snackbarHostState = remember { SnackbarHostState() }
     // Updated on configuration changes without restarting the effect, which would drop a shown snackbar.
     val resources by rememberUpdatedState(LocalResources.current)
@@ -151,6 +157,8 @@ internal fun SettingsRoute(
         onDiagnosticsRecordingChange = viewModel::setDiagnosticsRecording,
         onExportDiagnostics = { diagnosticsExportLauncher.launch(viewModel.suggestedDiagnosticsFileName) },
         onClearDiagnostics = viewModel::clearDiagnostics,
+        donationState = donationState,
+        onDonate = { option -> activity?.let { viewModel.donate(it, option) } },
     )
 }
 
@@ -190,6 +198,8 @@ internal fun SettingsScreen(
     onDiagnosticsRecordingChange: (Boolean) -> Unit,
     onExportDiagnostics: () -> Unit,
     onClearDiagnostics: () -> Unit,
+    donationState: DonationState,
+    onDonate: (DonationOption) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -240,6 +250,7 @@ internal fun SettingsScreen(
             )
 
             AboutSection(appInfo)
+            SupportSection(donationState, onDonate)
         }
     }
 }
@@ -525,6 +536,37 @@ private fun AboutSection(appInfo: AppInfo) {
         subtitle = appInfo.sourceCodeUrl,
         onClick = { uriHandler.openUri(appInfo.sourceCodeUrl) },
     )
+}
+
+/** Ways to donate, at the very bottom; builds that can't take donations leave it out. */
+@Composable
+private fun SupportSection(donationState: DonationState, onDonate: (DonationOption) -> Unit) {
+    if (donationState == DonationState.Unavailable) return
+    SectionHeader(stringResource(R.string.feature_settings_section_support))
+    Text(
+        text = stringResource(R.string.feature_settings_support_summary),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+    )
+    when (donationState) {
+        is DonationState.Ready -> donationState.options.forEach { option ->
+            SettingsRow(
+                icon = Icons.Outlined.LocalCafe,
+                title = option.title,
+                subtitle = option.detail,
+                onClick = { onDonate(option) },
+            )
+        }
+
+        DonationState.Loading -> LinearProgressIndicator(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+        )
+
+        DonationState.Unavailable -> Unit
+    }
 }
 
 @Composable

@@ -8,6 +8,7 @@ import io.github.abhik9.expirywatch.core.diagnostics.DiagnosticsLog
 import io.github.abhik9.expirywatch.core.domain.repository.ItemRepository
 import io.github.abhik9.expirywatch.core.domain.repository.UserSettingsRepository
 import io.github.abhik9.expirywatch.core.domain.usecase.SyncReminderScheduleUseCase
+import io.github.abhik9.expirywatch.core.donations.Donations
 import io.github.abhik9.expirywatch.core.notifications.ExpiryNotifier
 import io.github.abhik9.expirywatch.feature.widget.ExpiryWidgetUpdater
 import javax.inject.Inject
@@ -29,6 +30,7 @@ class AppStartup @Inject constructor(
     private val settingsRepository: UserSettingsRepository,
     private val widgetUpdater: ExpiryWidgetUpdater,
     private val notifier: ExpiryNotifier,
+    private val donations: Donations,
     private val diagnosticsLog: DiagnosticsLog,
     private val appInfo: AppInfo,
 ) {
@@ -39,6 +41,8 @@ class AppStartup @Inject constructor(
 
         AppShortcuts.publish(context)
         notifier.createChannel()
+        // Also completes tips paid while the app was closed.
+        donations.refresh()
 
         // Keep the daily reminder in line with the settings for as long as the process lives.
         applicationScope.launch { syncReminderSchedule() }

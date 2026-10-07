@@ -1,5 +1,6 @@
 package io.github.abhik9.expirywatch.feature.settings
 
+import android.app.Activity
 import app.cash.turbine.test
 import io.github.abhik9.expirywatch.core.common.AppInfo
 import io.github.abhik9.expirywatch.core.common.diagnostics.EventLog
@@ -7,6 +8,9 @@ import io.github.abhik9.expirywatch.core.domain.usecase.BackupResult
 import io.github.abhik9.expirywatch.core.domain.usecase.ExportBackupUseCase
 import io.github.abhik9.expirywatch.core.domain.usecase.ExportDiagnosticsUseCase
 import io.github.abhik9.expirywatch.core.domain.usecase.ImportBackupUseCase
+import io.github.abhik9.expirywatch.core.donations.DonationOption
+import io.github.abhik9.expirywatch.core.donations.DonationState
+import io.github.abhik9.expirywatch.core.donations.Donations
 import io.github.abhik9.expirywatch.core.model.ThemeMode
 import io.github.abhik9.expirywatch.core.navigation.LabelKind
 import io.github.abhik9.expirywatch.core.testing.MainDispatcherRule
@@ -26,6 +30,8 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -41,6 +47,7 @@ class SettingsViewModelTest {
     private val backups = FakeBackupRepository()
     private val documents = FakeDocumentStore()
     private val diagnostics = FakeDiagnosticsRepository(report = "the report")
+    private val donations = FakeDonations()
 
     // Lazy, so the ViewModel is created after MainDispatcherRule has replaced the main dispatcher.
     private val viewModel by lazy {
@@ -52,7 +59,14 @@ class SettingsViewModelTest {
             exportDiagnostics = ExportDiagnosticsUseCase(diagnostics, documents, EventLog.NONE),
             clock = TestTime.clock,
             appInfo = AppInfo(versionName = "1.0", barcodeEngine = "ZXing", sourceCodeUrl = "https://example.com"),
+            donations = donations,
         )
+    }
+
+    @Test
+    fun offersDonationsFreshlyLoaded() {
+        assertEquals(donations.state.value, viewModel.donationState.value)
+        assertEquals(1, donations.refreshes)
     }
 
     @Test
@@ -129,5 +143,19 @@ class SettingsViewModelTest {
 
         labels.delete(afterEdits.first { it.name == "Spices" })
         assertEquals(listOf("Milk products"), labels.labels.filterNotNull().first().map { it.name })
+    }
+
+    private class FakeDonations : Donations {
+        override val state = MutableStateFlow<DonationState>(
+            DonationState.Ready(listOf(DonationOption("tip", "Coffee", "€3"))),
+        )
+        override val thanks = emptyFlow<Unit>()
+        var refreshes = 0
+
+        override fun refresh() {
+            refreshes++
+        }
+
+        override fun donate(activity: Activity, option: DonationOption) = Unit
     }
 }

@@ -98,6 +98,9 @@
     <string name="feature_settings_online_lookup">Look up products online</string>
     <string name="feature_settings_online_lookup_summary">Fill in unknown products from Open Food Facts. When off, barcodes never leave your device and only products you saved before are filled in.</string>
 
+    <string name="feature_settings_section_support">Support ExpiryWatch</string>
+    <string name="feature_settings_support_summary">ExpiryWatch is free and always will be. If you\'d like to say thanks, a coffee is warmly appreciated but never expected.</string>
+
     <string name="feature_settings_section_about">About</string>
     <string name="feature_settings_version">Version</string>
     <string name="feature_settings_barcode_engine">Barcode scanning</string>

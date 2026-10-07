@@ -28,6 +28,7 @@ hilt = "2.60.1"
 kotlinxCoroutines = "1.11.0"
 kotlinxSerialization = "1.11.0"
 mlkitBarcode = "17.3.0"
+playBilling = "8.0.0"
 okhttp = "5.4.0"
 retrofit = "3.0.0"
 zxing = "3.5.4"
@@ -92,6 +93,7 @@ kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 mlkit-barcodeScanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
+billing = { group = "com.android.billingclient", name = "billing", version.ref = "playBilling" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver3", version.ref = "okhttp" }

@@ -27,6 +27,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import io.github.abhik9.expirywatch.core.common.navigation.DeepLink
+import io.github.abhik9.expirywatch.core.donations.DonationOption
+import io.github.abhik9.expirywatch.core.donations.DonationState
 import io.github.abhik9.expirywatch.core.navigation.ItemsNavKey
 import io.github.abhik9.expirywatch.core.navigation.Navigator
 import io.github.abhik9.expirywatch.feature.editor.navigation.editorEntry
@@ -34,14 +36,24 @@ import io.github.abhik9.expirywatch.feature.insights.navigation.insightsEntry
 import io.github.abhik9.expirywatch.feature.items.navigation.itemsEntry
 import io.github.abhik9.expirywatch.feature.settings.navigation.settingsEntries
 import io.github.abhik9.expirywatch.navigation.TopLevelDestination
+import kotlinx.coroutines.flow.Flow
 
 /**
  * The app shell: an adaptive navigation bar (or rail on wide screens) around the screen on top
  * of the back stack. The bar is hidden on detail screens such as the editor.
+ *
+ * @param showWelcome whether to welcome the user, the first time the app is opened; `null` while
+ * that isn't known yet.
+ * @param thanks emits when a donation went through.
  */
 @Composable
 fun ExpiryWatchApp(
     remindersEnabled: Boolean,
+    showWelcome: Boolean?,
+    donationState: DonationState,
+    thanks: Flow<Unit>,
+    onDonate: (DonationOption) -> Unit,
+    onWelcomeDismissed: () -> Unit,
     pendingDeepLink: DeepLink?,
     onDeepLinkHandled: () -> Unit,
 ) {
@@ -54,7 +66,24 @@ fun ExpiryWatchApp(
             onDeepLinkHandled()
         }
     }
-    if (remindersEnabled) NotificationPermissionRequest()
+    when (showWelcome) {
+        true -> WelcomeDialog(
+            donationState = donationState,
+            onDonate = { option ->
+                onWelcomeDismissed()
+                onDonate(option)
+            },
+            onDismiss = onWelcomeDismissed,
+        )
+
+        // Only once the welcome is out of the way, so the two dialogs don't stack.
+        false -> if (remindersEnabled) NotificationPermissionRequest()
+
+        null -> Unit
+    }
+    var showThanks by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(thanks) { thanks.collect { showThanks = true } }
+    if (showThanks) ThanksDialog(onDismiss = { showThanks = false })
 
     val currentKey = backStack.lastOrNull() ?: ItemsNavKey()
     val currentTopLevelKey = navigator.currentTopLevelKey

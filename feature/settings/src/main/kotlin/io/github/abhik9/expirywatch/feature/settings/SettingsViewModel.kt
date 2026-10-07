@@ -1,5 +1,6 @@
 package io.github.abhik9.expirywatch.feature.settings
 
+import android.app.Activity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,6 +14,9 @@ import io.github.abhik9.expirywatch.core.domain.usecase.BackupResult
 import io.github.abhik9.expirywatch.core.domain.usecase.ExportBackupUseCase
 import io.github.abhik9.expirywatch.core.domain.usecase.ExportDiagnosticsUseCase
 import io.github.abhik9.expirywatch.core.domain.usecase.ImportBackupUseCase
+import io.github.abhik9.expirywatch.core.donations.DonationOption
+import io.github.abhik9.expirywatch.core.donations.DonationState
+import io.github.abhik9.expirywatch.core.donations.Donations
 import io.github.abhik9.expirywatch.core.model.ThemeMode
 import io.github.abhik9.expirywatch.core.model.UserSettings
 import java.time.Clock
@@ -54,6 +58,7 @@ class SettingsViewModel @Inject constructor(
     private val exportDiagnostics: ExportDiagnosticsUseCase,
     private val clock: Clock,
     val appInfo: AppInfo,
+    private val donations: Donations,
 ) : ViewModel() {
     val settings: StateFlow<UserSettings?> = settingsRepository.settings
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS), null)
@@ -67,6 +72,15 @@ class SettingsViewModel @Inject constructor(
 
     var isBackupInProgress by mutableStateOf(false)
         private set
+
+    val donationState: StateFlow<DonationState> = donations.state
+
+    init {
+        // In case it failed earlier, e.g. while offline.
+        donations.refresh()
+    }
+
+    fun donate(activity: Activity, option: DonationOption) = donations.donate(activity, option)
 
     private val _events = Channel<SettingsEvent>(Channel.BUFFERED)
     val events: Flow<SettingsEvent> = _events.receiveAsFlow()

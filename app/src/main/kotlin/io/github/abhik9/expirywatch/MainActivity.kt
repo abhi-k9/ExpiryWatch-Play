@@ -41,6 +41,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val showWelcome by viewModel.showWelcome.collectAsStateWithLifecycle()
+            val donationState by viewModel.donationState.collectAsStateWithLifecycle()
             val settings = (uiState as? MainActivityUiState.Success)?.settings ?: return@setContent
 
             val darkTheme = when (settings.themeMode) {
@@ -59,6 +61,11 @@ class MainActivity : ComponentActivity() {
             ExpiryWatchTheme(darkTheme = darkTheme, dynamicColor = settings.useDynamicColor) {
                 ExpiryWatchApp(
                     remindersEnabled = settings.remindersEnabled,
+                    showWelcome = showWelcome,
+                    donationState = donationState,
+                    thanks = viewModel.thanks,
+                    onDonate = { option -> viewModel.donate(this, option) },
+                    onWelcomeDismissed = viewModel::onWelcomeDismissed,
                     pendingDeepLink = pendingDeepLink,
                     onDeepLinkHandled = { pendingDeepLink = null },
                 )

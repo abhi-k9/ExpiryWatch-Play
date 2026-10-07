@@ -153,6 +153,22 @@ The version sets the app's version name (`1.2.0`) and version code (`10200`), so
 between 0 and 99. Local builds are version `1.0.0` unless you pass
 `-Pexpirywatch.versionName=1.2.0`. The workflow refuses to publish without the signing secrets.
 
+## Donations (`main-play` branch)
+
+The `main-play` branch, for the Google Play build, adds a welcome message on first launch and a
+**Support ExpiryWatch** section at the bottom of Settings. Every feature stays free.
+
+- The `play` flavor takes tips through Google Play's billing, as Play's payments policy requires.
+  Create one-time products with the ids `tip_small`, `tip_medium` and `tip_large` in the Play
+  Console; the app shows their names and prices from there, and leaves the section out until Google
+  Play offers at least one.
+- The `foss` flavor opens a PayPal link. The link isn't in the repository: add it as the
+  `DONATION_URL` repository secret for CI, or pass `-Pexpirywatch.donationUrl=https://…` to local
+  builds. Without it, the `foss` flavor offers no donations. The link is part of the built app, so
+  anyone with the APK can read it.
+
+`main` stays free of donations; merge `main` into `main-play` to bring it up to date.
+
 ## Testing and checks
 
 ```bash

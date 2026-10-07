@@ -14,6 +14,17 @@ val keystoreProperties = rootProject.file("keystore.properties").takeIf { it.exi
 // The release workflow passes the version from the git tag, e.g. -Pexpirywatch.versionName=1.2.3.
 val appVersionName: String = providers.gradleProperty("expirywatch.versionName").getOrElse("1.0.0")
 
+// The PayPal link the foss flavor offers for donations. It's kept out of the repository: pass it as
+// the expirywatch.donationUrl Gradle property or the DONATION_URL environment variable (a secret in
+// CI). Without it, the foss flavor offers no donations. The play flavor uses Google Play's billing.
+val donationUrl: String = providers.gradleProperty("expirywatch.donationUrl")
+    .orElse(providers.environmentVariable("DONATION_URL"))
+    .getOrElse("")
+    .trim()
+require(donationUrl.isEmpty() || donationUrl.matches(Regex("https://[^\\s\"\\\\]+"))) {
+    "The donation link must be an https:// URL."
+}
+
 /** Turns "1.2.3" into 10203, so every release has a higher version code than the one before. */
 fun versionCodeOf(versionName: String): Int {
     val parts = versionName.split('.').map { it.toIntOrNull() }
@@ -49,6 +60,7 @@ android {
         create("foss") {
             dimension = "distribution"
             buildConfigField("String", "BARCODE_ENGINE", "\"ZXing\"")
+            buildConfigField("String", "DONATION_URL", "\"$donationUrl\"")
         }
     }
 
@@ -89,6 +101,7 @@ dependencies {
     implementation(projects.core.data)
     implementation(projects.core.designsystem)
     implementation(projects.core.diagnostics)
+    implementation(projects.core.donations)
     implementation(projects.core.domain)
     implementation(projects.core.model)
     implementation(projects.core.navigation)
@@ -101,6 +114,7 @@ dependencies {
     implementation(projects.feature.settings)
     implementation(projects.feature.widget)
 
+    "playImplementation"(projects.core.billing)
     "playImplementation"(projects.core.scannerMlkit)
     "fossImplementation"(projects.core.scannerZxing)
 
