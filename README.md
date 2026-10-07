@@ -169,6 +169,16 @@ The `main-play` branch, for the Google Play build, adds a welcome message on fir
 
 `main` stays free of donations; merge `main` into `main-play` to bring it up to date.
 
+## Google Play release (`main-play` branch)
+
+The **Play bundle** workflow builds the signed app bundle of the `play` flavor: run it from the
+Actions tab on `main-play` with the version, such as `1.4.0`, and download the bundle and its R8
+mapping from the run's artifacts. It's signed with the release key, which serves as the upload key
+with Play App Signing. Version codes follow the version, so each upload needs a higher version.
+
+The store listing text is in [`fastlane/metadata/android/en-US`](fastlane/metadata/android/en-US),
+and the privacy policy the Play Console asks for is [PRIVACY.md](PRIVACY.md).
+
 ## Testing and checks
 
 ```bash

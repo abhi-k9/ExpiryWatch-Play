@@ -1,0 +1,32 @@
+ExpiryWatch keeps track of when your groceries, medicine and anything else expires, and reminds you before things go off, so less ends up in the bin.
+
+It's free, has no ads, and every feature will stay free.
+
+<b>Add items in seconds</b>
+• Scan a barcode and the name, brand and photo are filled in for you
+• Products you've saved before are remembered, so the next time is even quicker
+• Several of the same product? Add each expiry date at once, such as for every carton of a multipack
+• Record when you opened something and how long it keeps afterwards; the earlier date counts
+
+<b>Always know what to use first</b>
+• Items are sorted by expiry and grouped into Expired, Expiring soon and Fresh
+• Several items of the same product fold into one row that shows the next to expire
+• Search, and filter by category or storage location
+• Swipe right when something is used up, left when it's thrown away, with undo
+
+<b>Reminders that fit your day</b>
+• A daily reminder at the time you choose, listing what has expired or is about to
+• Optionally at the exact time, even when your phone is idle
+• A home-screen widget showing what expires next
+
+<b>See how you're doing</b>
+• Insights show how much you used up versus threw away, a monthly trend and the categories you waste most
+
+<b>Your data stays yours</b>
+• No account and no ads; everything is stored on your device
+• Back up to and restore from a file you choose
+• Looking up products online can be turned off, so barcodes never leave your device
+
+ExpiryWatch is open source: https://github.com/abhi-k9/ExpiryWatch
+
+Product data comes from Open Food Facts (https://world.openfoodfacts.org), available under the Open Database License.

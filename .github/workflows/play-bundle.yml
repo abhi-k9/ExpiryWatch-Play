@@ -1,0 +1,61 @@
+name: Play bundle
+
+# Builds the signed app bundle of the play flavor, for uploading to Google Play. Run it from the
+# Actions tab on main-play with the version, then download the bundle from the run's artifacts and
+# upload it in the Play Console. It's signed with the release key, which Google Play uses as the
+# upload key when Play App Signing is on.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to build, such as 1.4.0
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    name: Build the Play bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - name: Read the version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          version="${INPUT_VERSION#v}"
+          if ! [[ "$version" =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then
+            echo "::error::Versions must look like 1.2.3 (each part 0-99), but got \"$version\"."
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/setup
+      - name: Set up release signing
+        uses: ./.github/actions/release-signing
+        with:
+          keystore-base64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          keystore-password: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          key-alias: ${{ secrets.RELEASE_KEY_ALIAS }}
+          key-password: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          # Google Play only accepts bundles signed with the upload key.
+          required: true
+      - name: Build the signed bundle
+        run: ./gradlew bundlePlayRelease "-Pexpirywatch.versionName=$VERSION"
+      - name: Collect the bundle and its R8 mapping
+        run: |
+          mkdir dist
+          cp app/build/outputs/bundle/playRelease/*.aab "dist/ExpiryWatch-$VERSION-play.aab"
+          # Upload it with the bundle in the Play Console (App bundle explorer, Downloads), so crash
+          # reports there are readable. The Retrace workflow can use it too.
+          mapping=$(find app/build -name mapping.txt -path "*playRelease*" | sort | head -1)
+          cp "$mapping" "dist/ExpiryWatch-$VERSION-play-mapping.txt"
+          (cd dist && sha256sum -- * > SHA256SUMS.txt)
+          echo "Version code: $(( $(echo "$VERSION" | awk -F. '{print $1 * 10000 + $2 * 100 + $3}') ))"
+      - name: Upload the bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: ExpiryWatch-${{ env.VERSION }}-play-bundle
+          path: dist/
+          if-no-files-found: error
