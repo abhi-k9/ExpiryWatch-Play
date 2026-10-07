@@ -1,8 +1,8 @@
 name: Play bundle
 
 # Builds the signed app bundle of the play flavor, for uploading to Google Play. Run it from the
-# Actions tab on main-play with the version, then download the bundle from the run's artifacts and
-# upload it in the Play Console. It's signed with the release key, which Google Play uses as the
+# Actions tab with the version, then download the bundle from the run's artifacts and upload it in
+# the Play Console. It's signed with the release key, which Google Play uses as the
 # upload key when Play App Signing is on.
 on:
   workflow_dispatch:

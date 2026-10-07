@@ -1,7 +1,16 @@
-# ExpiryWatch
+# ExpiryWatch for Google Play
 
-An Android app that keeps track of when your groceries, medicine and anything else expires, and
-reminds you before things go off.
+This is the Google Play edition of [ExpiryWatch](https://github.com/abhi-k9/ExpiryWatch): the same
+app, plus a welcome message and optional donations (see [Donations](#donations)). Every feature is
+free in both. Changes to the app itself are made in ExpiryWatch and merged here:
+
+```bash
+git remote add upstream https://github.com/abhi-k9/ExpiryWatch.git
+git fetch upstream && git merge upstream/main
+```
+
+ExpiryWatch is an Android app that keeps track of when your groceries, medicine and anything else
+expires, and reminds you before things go off.
 
 Built with Kotlin, Jetpack Compose and Material 3, following Google's recommended app architecture.
 
@@ -142,7 +151,7 @@ To sign the release APKs built by CI and the release workflow, add these reposit
 
 ### Releases
 
-The release workflow publishes a [GitHub release](https://github.com/abhi-k9/ExpiryWatch/releases)
+The release workflow publishes a [GitHub release](https://github.com/abhi-k9/ExpiryWatch-Play/releases)
 with signed APKs of both flavors and their SHA-256 checksums. Start it either way:
 
 - In the Actions tab, open **Release**, choose **Run workflow** and enter the version, such as
@@ -153,10 +162,10 @@ The version sets the app's version name (`1.2.0`) and version code (`10200`), so
 between 0 and 99. Local builds are version `1.0.0` unless you pass
 `-Pexpirywatch.versionName=1.2.0`. The workflow refuses to publish without the signing secrets.
 
-## Donations (`main-play` branch)
+## Donations
 
-The `main-play` branch, for the Google Play build, adds a welcome message on first launch and a
-**Support ExpiryWatch** section at the bottom of Settings. Every feature stays free.
+This edition adds a welcome message on first launch and a **Support ExpiryWatch** section at the
+bottom of Settings. Every feature stays free.
 
 - The `play` flavor takes tips through Google Play's billing, as Play's payments policy requires.
   Create one-time products with the ids `tip_small`, `tip_medium` and `tip_large` in the Play
@@ -167,12 +176,10 @@ The `main-play` branch, for the Google Play build, adds a welcome message on fir
   builds. Without it, the `foss` flavor offers no donations. The link is part of the built app, so
   anyone with the APK can read it.
 
-`main` stays free of donations; merge `main` into `main-play` to bring it up to date.
-
-## Google Play release (`main-play` branch)
+## Google Play release
 
 The **Play bundle** workflow builds the signed app bundle of the `play` flavor: run it from the
-Actions tab on `main-play` with the version, such as `1.4.0`, and download the bundle and its R8
+Actions tab with the version, such as `1.4.0`, and download the bundle and its R8
 mapping from the run's artifacts. It's signed with the release key, which serves as the upload key
 with Play App Signing. Version codes follow the version, so each upload needs a higher version.
 

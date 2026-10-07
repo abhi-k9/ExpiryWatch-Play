@@ -50,4 +50,4 @@ ExpiryWatch isn't directed at children and doesn't knowingly collect data from a
 ## Changes and contact
 
 Changes to this policy are published here. For questions, open an issue at
-https://github.com/abhi-k9/ExpiryWatch/issues.
+https://github.com/abhi-k9/ExpiryWatch-Play/issues.

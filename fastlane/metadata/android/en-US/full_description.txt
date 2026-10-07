@@ -27,6 +27,6 @@ It's free, has no ads, and every feature will stay free.
 • Back up to and restore from a file you choose
 • Looking up products online can be turned off, so barcodes never leave your device
 
-ExpiryWatch is open source: https://github.com/abhi-k9/ExpiryWatch
+ExpiryWatch is open source: https://github.com/abhi-k9/ExpiryWatch-Play
 
 Product data comes from Open Food Facts (https://world.openfoodfacts.org), available under the Open Database License.

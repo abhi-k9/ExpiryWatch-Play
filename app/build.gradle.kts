@@ -42,7 +42,7 @@ android {
         applicationId = "io.github.abhik9.expirywatch"
         versionCode = versionCodeOf(appVersionName)
         versionName = appVersionName
-        buildConfigField("String", "SOURCE_CODE_URL", "\"https://github.com/abhi-k9/expirywatch\"")
+        buildConfigField("String", "SOURCE_CODE_URL", "\"https://github.com/abhi-k9/ExpiryWatch-Play\"")
     }
 
     buildFeatures {
